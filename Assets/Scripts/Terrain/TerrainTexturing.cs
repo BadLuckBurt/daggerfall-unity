@@ -44,6 +44,7 @@ namespace DaggerfallWorkshop
 
         public JobHandle ScheduleAssignTilesJob(ITerrainSampler terrainSampler, ref MapPixelData mapData, JobHandle dependencies, bool march = true)
         {
+            float locationSize = Mathf.Max((mapData.locationRect.xMax - mapData.locationRect.xMin),(mapData.locationRect.yMax - mapData.locationRect.yMin));
             // Cache tile data to minimise noise sampling during march.
             NativeArray<byte> tileData = new NativeArray<byte>(tileDataDim * tileDataDim, Allocator.TempJob);
             GenerateTileDataJob tileDataJob = new GenerateTileDataJob
@@ -57,6 +58,18 @@ namespace DaggerfallWorkshop
                 beachElevation = terrainSampler.BeachElevation,
                 mapPixelX = mapData.mapPixelX,
                 mapPixelY = mapData.mapPixelY,
+                /* BLB: Added but not currently used except for locationID and locationSize */
+                locationID = mapData.locationID,
+                locationNorth = mapData.locationNorth,
+                locationNorthEast = mapData.locationNorthEast,
+                locationEast = mapData.locationEast,
+                locationSouthEast = mapData.locationSouthEast,
+                locationSouth = mapData.locationSouth,
+                locationSouthWest = mapData.locationSouthWest,
+                locationWest = mapData.locationWest,
+                locationNorthWest = mapData.locationNorthWest,
+                locationSize = locationSize
+                /* BLB: Added but not currently used except for locationID and locationSize */
             };
             JobHandle tileDataHandle = tileDataJob.Schedule(tileDataDim * tileDataDim, 64, dependencies);
 
@@ -147,6 +160,19 @@ namespace DaggerfallWorkshop
             public int mapPixelX;
             public int mapPixelY;
 
+            public int locationID;
+            public int worldClimate;
+            public bool locationNorth;
+            public bool locationNorthEast;
+            public bool locationEast;
+            public bool locationSouthEast;
+            public bool locationSouth;
+            public bool locationSouthWest;
+            public bool locationWest;
+            public bool locationNorthWest;
+
+            public float locationSize;
+
             // Gets noise value
             private float NoiseWeight(float worldX, float worldY)
             {
@@ -156,6 +182,34 @@ namespace DaggerfallWorkshop
             // Sets texture by range
             private byte GetWeightedRecord(float weight, float lowerGrassSpread = 0.5f, float upperGrassSpread = 0.95f)
             {
+                if (weight < lowerGrassSpread)
+                    return dirt;
+                else if (weight > upperGrassSpread)
+                    return stone;
+                else
+                    return grass;
+            }
+
+            // Sets texture by range + climate
+            private byte GetClimateWeightedRecord(float weight, int worldClimate)
+            {
+                //Temperate as default values
+                float lowerGrassSpread = 0.35f;
+                float upperGrassSpread = 0.85f;
+                //Swamp, mostly grass
+                if(worldClimate == 227 || worldClimate == 228) {
+                    lowerGrassSpread = 0.25f;
+                    upperGrassSpread = 0.75f;
+                //Desert
+                } else if(worldClimate == 224 || worldClimate == 225 || worldClimate == 259) {
+                    lowerGrassSpread = 0.375f;
+                    upperGrassSpread = 0.625f;
+                //Mountain
+                } else if(worldClimate == 226 || worldClimate == 230) {
+                    lowerGrassSpread = 0.25f;
+                    upperGrassSpread = 0.65f;
+                }
+
                 if (weight < lowerGrassSpread)
                     return dirt;
                 else if (weight > upperGrassSpread)
@@ -194,29 +248,101 @@ namespace DaggerfallWorkshop
                 int hx = (int)Mathf.Clamp(hDim * ((float)x / (float)tdDim), 0, hDim - 1);
                 int hy = (int)Mathf.Clamp(hDim * ((float)y / (float)tdDim), 0, hDim - 1);
                 float height = heightmapData[JobA.Idx(hy, hx, hDim)] * maxTerrainHeight;  // x & y swapped in heightmap for TerrainData.SetHeights()
+
+                // Get latitude and longitude of this tile
+                int latitude = (int)(mapPixelX * MapsFile.WorldMapTileDim + x);
+                int longitude = (int)(MapsFile.MaxWorldTileCoordZ - mapPixelY * MapsFile.WorldMapTileDim + y);
+                // Set texture tile using weighted noise
+                float weight = 0;
+                float rndCheck = 0.5f;
+                float rnd = 0.0f;
+                int randMin = -20000000;
+                int randMax = 10000000;
+                //Dealing with a location near water
+                if(height <= beachElevation && worldClimate != 223 && 
+                (
+                    (locationID > -1)
+                    /*(locationNorthWest && x < 32 && y < 32) || 
+                    (locationNorthEast && x > 96 && y < 32) || 
+                    (locationSouthEast && x > 96 && y > 96) || 
+                    (locationSouthWest && x < 32 && y > 96) || 
+                    (locationWest && x < 32) || 
+                    (locationEast && x > 96) ||
+                    (locationNorth && y < 32) || 
+                    (locationSouth && y > 96)*/
+                )) {                            
+                    float fx = x / 128.0f;
+                    float fy = y / 128.0f;
+
+                    //As we get closer to the center of the tile, we allow more dirt tiles
+                    //by lowering the rndCheck
+                    if(
+                        (fx < 0.0625f || fy < 0.0625f) || 
+                        (fx > 0.9375f || fy > 0.9375f)
+                    ) {
+                        rndCheck = 1.075f;
+                    } else if(
+                        (fx < 0.125f || fy < 0.125f) || 
+                        (fx > 0.875f || fy > 0.875f)
+                    ) {
+                        rndCheck = 1.0f;
+                    } else if(
+                        (fx < 0.25f || fy < 0.25f) || 
+                        (fx > 0.75f || fy > 0.75f)
+                    ) {
+                        rndCheck = 0.85f;
+                    } else if(
+                        (fx < 0.3125f || fy < 0.3125f) || 
+                        (fx > 0.6875f || fy > 0.6875f)
+                    ) {
+                        rndCheck = 0.75f;
+                    } else if(
+                        (fx < 0.3750f || fy < 0.3750f) || 
+                        (fx > 0.625f || fy > 0.625f)
+                    ) {
+                        rndCheck = 0.65f;
+                    } else if(
+                        (fx < 0.4375f || fy < 0.4375f) || 
+                        (fx > 0.5625f || fy > 0.5625f)
+                    ) {
+                        rndCheck = 0.3875f;
+                    } else if(
+                        (fx <= 0.5f || fy <= 0.5f) || 
+                        (fx > 0.5f || fy > 0.5f)
+                    ) {
+                        rndCheck = 0.1f;
+                    }
+                    rndCheck = rndCheck - (locationSize / 128);
+                    rnd = NoiseWeight(latitude, longitude);
+                    if(rnd >= rndCheck) {
+                        tileData[index] = dirt;
+                        return;
+                    }
+                    tileData[index] = water;
+                    return;
+                }
+                randMin = -60000000;
+                randMax = 1000000;
+                rnd = (JobRand.Next(randMin, randMax) / 10000000f);
                 // Ocean texture
-                if (height <= oceanElevation)
+                if ((height + rnd) <= oceanElevation || worldClimate == 223)
                 {
                     tileData[index] = water;
                     return;
                 }
                 // Beach texture
                 // Adds a little +/- randomness to threshold so beach line isn't too regular
-                if (height <= beachElevation + (JobRand.Next(-15000000, 15000000) / 10000000f))
+                if (height > oceanElevation && height < beachElevation)
                 {
                     tileData[index] = dirt;
                     return;
                 }
 
-                // Get latitude and longitude of this tile
-                int latitude = (int)(mapPixelX * MapsFile.WorldMapTileDim + x);
-                int longitude = (int)(MapsFile.MaxWorldTileCoordZ - mapPixelY * MapsFile.WorldMapTileDim + y);
-
                 // Set texture tile using weighted noise
-                float weight = 0;
+                weight = 0;
                 weight += NoiseWeight(latitude, longitude);
                 // TODO: Add other weights to influence texture tile generation
-                tileData[index] = GetWeightedRecord(weight);
+                tileData[index] = GetClimateWeightedRecord(weight, worldClimate);
             }
         }
 

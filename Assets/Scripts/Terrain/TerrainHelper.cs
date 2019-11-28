@@ -60,6 +60,19 @@ namespace DaggerfallWorkshop
             // Read general data from world maps
             int worldHeight = contentReader.WoodsFileReader.GetHeightMapValue(mapPixelX, mapPixelY);
             int worldClimate = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY);
+
+            /* BLB: Extra terrain sampler climate info to make it aware of neighbouring climates */
+            bool seaLevel = (worldHeight <= 2);
+            int worldClimateNorth = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY + 1);
+            int worldClimateNorthEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY + 1);
+            int worldClimateEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY);
+            int worldClimateSouthEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY - 1);
+            int worldClimateSouth = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY - 1);
+            int worldClimateSouthWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY - 1);
+            int worldClimateWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY);
+            int worldClimateNorthWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY + 1);
+            /* BLB: Extra terrain sampler info */
+
             int worldPolitic = contentReader.MapFileReader.GetPoliticIndex(mapPixelX, mapPixelY);
 
             // Get location if present
@@ -76,6 +89,17 @@ namespace DaggerfallWorkshop
                 locationName = location.Name;
             }
 
+            /* BLB: Extra info to make the terrain sampler of neighbouring locations */
+            bool locationNorthWest = contentReader.HasLocation(mapPixelX - 1, mapPixelY + 1, out mapSummary);
+            bool locationNorth = contentReader.HasLocation(mapPixelX, mapPixelY + 1, out mapSummary);
+            bool locationNorthEast = contentReader.HasLocation(mapPixelX + 1, mapPixelY + 1, out mapSummary);
+            bool locationEast = contentReader.HasLocation(mapPixelX + 1, mapPixelY, out mapSummary);
+            bool locationSouthEast = contentReader.HasLocation(mapPixelX + 1, mapPixelY - 1, out mapSummary);
+            bool locationSouth = contentReader.HasLocation(mapPixelX, mapPixelY - 1, out mapSummary);
+            bool locationSouthWest = contentReader.HasLocation(mapPixelX - 1, mapPixelY - 1, out mapSummary);
+            bool locationWest = contentReader.HasLocation(mapPixelX - 1, mapPixelY, out mapSummary);
+            /* BLB: Extra info to make the terrain sampler of neighbouring locations */
+
             // Create map pixel data
             MapPixelData mapPixel = new MapPixelData()
             {
@@ -90,6 +114,26 @@ namespace DaggerfallWorkshop
                 mapLocationIndex = mapIndex,
                 locationID = id,
                 locationName = locationName,
+
+                /* BLB: Added world climate and location info for neighbours */
+                worldClimateNorth = worldClimateNorth,
+                worldClimateNorthEast = worldClimateNorthEast,
+                worldClimateEast = worldClimateEast,
+                worldClimateSouthEast = worldClimateSouthEast,
+                worldClimateSouth = worldClimateSouth,
+                worldClimateSouthWest = worldClimateSouthWest,
+                worldClimateWest = worldClimateWest,
+                worldClimateNorthWest = worldClimateNorthWest,
+
+                locationNorth = locationNorth,
+                locationNorthEast = locationNorthEast,
+                locationEast = locationEast,
+                locationSouthEast = locationSouthEast,
+                locationSouth = locationSouth,
+                locationSouthWest = locationSouthEast,
+                locationWest = locationWest,
+                locationNorthWest = locationNorthWest,
+                /* BLB: Added world climate and location info for neighbours */
             };
 
             return mapPixel;

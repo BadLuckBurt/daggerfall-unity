@@ -362,6 +362,31 @@ namespace DaggerfallWorkshop
         public int mapPixelY;                       // Map pixel Y coordinate
         public int worldHeight;                     // Height of this pixel (not scaled)
         public int worldClimate;                    // Climate of this pixel
+
+        /* BLB: Indicator for sealevel (worldHeight <= 2) - not currently used */
+        public bool seaLevel;
+        /* BLB: Neighbouring climates of the map pixel */
+        public int worldClimateNorth;
+        public int worldClimateNorthEast;
+        public int worldClimateEast;
+        public int worldClimateSouthEast;
+        public int worldClimateSouth;
+        public int worldClimateSouthWest;
+        public int worldClimateWest;
+        public int worldClimateNorthWest;
+        /* BLB: Neighbouring climates of the map pixel */
+
+        /* BLB: Neighbouring location indicators */
+        public bool locationNorth;
+        public bool locationNorthEast;
+        public bool locationEast;
+        public bool locationSouthEast;
+        public bool locationSouth;
+        public bool locationSouthWest;
+        public bool locationWest;
+        public bool locationNorthWest;
+        /* BLB: Neighbouring location indicators */
+
         public int worldPolitic;                    // Politics of this pixel
         public bool hasLocation;                    // True if location present
         public int mapRegionIndex;                  // Map region index (if location present)
