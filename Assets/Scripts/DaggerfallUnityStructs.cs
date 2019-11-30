@@ -351,18 +351,6 @@ namespace DaggerfallWorkshop
         public uint ModelID;                            // Numerical model ID of building in ARCH3D.BSA - 0 means no model found
     }
 
-    public enum Neighbours
-    {
-        North,
-        NorthEast,
-        East,
-        SouthEast,
-        South,
-        SouthWest,
-        West,
-        NorthWest
-    }
-
     /// <summary>
     /// Information about a single map pixel for streaming world.
     /// </summary>
@@ -374,18 +362,6 @@ namespace DaggerfallWorkshop
         public int mapPixelY;                       // Map pixel Y coordinate
         public int worldHeight;                     // Height of this pixel (not scaled)
         public int worldClimate;                    // Climate of this pixel
-
-        /* BLB: Neighbouring climates of the map pixel */
-        public int worldClimateNorth;
-        public int worldClimateNorthEast;
-        public int worldClimateEast;
-        public int worldClimateSouthEast;
-        public int worldClimateSouth;
-        public int worldClimateSouthWest;
-        public int worldClimateWest;
-        public int worldClimateNorthWest;
-        /* BLB: Neighbouring climates of the map pixel */
-
         public int worldPolitic;                    // Politics of this pixel
         public bool hasLocation;                    // True if location present
         public int mapRegionIndex;                  // Map region index (if location present)
@@ -415,7 +391,15 @@ namespace DaggerfallWorkshop
         public NativeArray<float> avgMaxHeight;     // Average and max height of terrain for location placement (unmanaged memory)
 
         [HideInInspector, NonSerialized]
+        public NativeArray<byte> adjacentClimates;   // Climate data for neighbouring map pixels (unmanaged memory)
+
+        [HideInInspector, NonSerialized]
         public List<IDisposable> nativeArrayList;   // List of temp working native arrays (unmanaged memory) for disposal when jobs complete
+
+        public enum Adjacent
+        {
+            North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest
+        }
     }
 
     /// <summary>

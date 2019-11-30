@@ -204,6 +204,10 @@ namespace DaggerfallWorkshop
             // Create data array for average & max heights.
             MapData.avgMaxHeight = new NativeArray<float>(new float[] { 0, float.MinValue }, Allocator.TempJob);
 
+            // Create data array for adjacent (neighbour) climates.
+            MapData.adjacentClimates = new NativeArray<byte>(8, Allocator.TempJob);
+            PopulateAdjacentClimatesArray(MapData.adjacentClimates);
+
             // Create list for recording native arrays that need disposal after jobs complete.
             MapData.nativeArrayList = new List<IDisposable>();
 
@@ -293,6 +297,8 @@ namespace DaggerfallWorkshop
                 MapData.avgMaxHeight.Dispose();
             if (MapData.tileMap.IsCreated)
                 MapData.tileMap.Dispose();
+            if (MapData.adjacentClimates.IsCreated)
+                MapData.adjacentClimates.Dispose();
         }
 
         /// <summary>
@@ -358,34 +364,47 @@ namespace DaggerfallWorkshop
 
         #region Editor Support
 
-//#if UNITY_EDITOR
-//        /// <summary>
-//        /// Allows editor to set terrain independently of StreamingWorld. 
-//        /// Mainly for testing purposes, but could be used for static scenes.
-//        /// Also shows full terrain setup procedure for reference.
-//        /// </summary>
-//        public void __EditorUpdateTerrain()
-//        {
-//            // Setup terrain
-//            InstantiateTerrain();
+        //#if UNITY_EDITOR
+        //        /// <summary>
+        //        /// Allows editor to set terrain independently of StreamingWorld. 
+        //        /// Mainly for testing purposes, but could be used for static scenes.
+        //        /// Also shows full terrain setup procedure for reference.
+        //        /// </summary>
+        //        public void __EditorUpdateTerrain()
+        //        {
+        //            // Setup terrain
+        //            InstantiateTerrain();
 
-//            // Update data for terrain
-//            UpdateMapPixelData();
-//            UpdateTileMapData();
-//            //UpdateHeightData();
+        //            // Update data for terrain
+        //            UpdateMapPixelData();
+        //            UpdateTileMapData();
+        //            //UpdateHeightData();
 
-//            // Promote data to live terrain
-//            UpdateClimateMaterial();
-//            PromoteTerrainData();
+        //            // Promote data to live terrain
+        //            UpdateClimateMaterial();
+        //            PromoteTerrainData();
 
-//            // Set neighbours
-//            UpdateNeighbours();
-//        }
-//#endif
+        //            // Set neighbours
+        //            UpdateNeighbours();
+        //        }
+        //#endif
 
         #endregion
 
         #region Private Methods
+
+        private void PopulateAdjacentClimatesArray(NativeArray<byte> climateArray)
+        {
+            MapsFile mapsFile = dfUnity.ContentReader.MapFileReader;
+            climateArray[(int)MapPixelData.Adjacent.North] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.NorthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.East] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY);
+            climateArray[(int)MapPixelData.Adjacent.SouthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.South] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.SouthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.West] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY);
+            climateArray[(int)MapPixelData.Adjacent.NorthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY + 1);
+        }
 
         private bool ReadyCheck()
         {

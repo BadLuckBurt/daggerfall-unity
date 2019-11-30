@@ -60,18 +60,6 @@ namespace DaggerfallWorkshop
             // Read general data from world maps
             int worldHeight = contentReader.WoodsFileReader.GetHeightMapValue(mapPixelX, mapPixelY);
             int worldClimate = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY);
-
-            /* BLB: Extra terrain sampler climate info to make it aware of neighbouring climates */
-            int worldClimateNorth = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY + 1);
-            int worldClimateNorthEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY + 1);
-            int worldClimateEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY);
-            int worldClimateSouthEast = contentReader.MapFileReader.GetClimateIndex(mapPixelX + 1, mapPixelY - 1);
-            int worldClimateSouth = contentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY - 1);
-            int worldClimateSouthWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY - 1);
-            int worldClimateWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY);
-            int worldClimateNorthWest = contentReader.MapFileReader.GetClimateIndex(mapPixelX - 1, mapPixelY + 1);
-            /* BLB: Extra terrain sampler info */
-
             int worldPolitic = contentReader.MapFileReader.GetPoliticIndex(mapPixelX, mapPixelY);
 
             // Get location if present
@@ -102,17 +90,6 @@ namespace DaggerfallWorkshop
                 mapLocationIndex = mapIndex,
                 locationID = id,
                 locationName = locationName,
-
-                /* BLB: Added world climate info for neighbours */
-                worldClimateNorth = worldClimateNorth,
-                worldClimateNorthEast = worldClimateNorthEast,
-                worldClimateEast = worldClimateEast,
-                worldClimateSouthEast = worldClimateSouthEast,
-                worldClimateSouth = worldClimateSouth,
-                worldClimateSouthWest = worldClimateSouthWest,
-                worldClimateWest = worldClimateWest,
-                worldClimateNorthWest = worldClimateNorthWest,
-                /* BLB: Added world climate info for neighbours */
             };
 
             return mapPixel;
