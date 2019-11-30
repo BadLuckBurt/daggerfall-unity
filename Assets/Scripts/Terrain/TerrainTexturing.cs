@@ -121,7 +121,7 @@ namespace DaggerfallWorkshop
                 int y = JobA.Col(index, tDim);
 
                 // Do nothing if in location rect as texture already set, to 0xFF if zero
-                if(locationID > -1 && 
+                if(
                     (x > locationRect.xMin - 4 && x < locationRect.xMax + 4) && 
                     (y > locationRect.yMin && y - 4 < locationRect.yMax + 4) && 
                     tilemapData[index] != 0 
@@ -325,7 +325,8 @@ namespace DaggerfallWorkshop
                     rndCheck = rndCheck - (locationSize / 128);
                     rnd = NoiseWeight(latitude, longitude);
                     if(rnd >= rndCheck) {
-                        tileData[index] = GetClimateWeightedRecord(rnd, worldClimate);
+                        //tileData[index] = GetClimateWeightedRecord(rnd, worldClimate);
+                        tileData[index] = dirt;
                         return;
                     }
                     tileData[index] = water;
