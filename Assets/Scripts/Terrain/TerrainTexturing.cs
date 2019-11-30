@@ -322,7 +322,7 @@ namespace DaggerfallWorkshop
                     ) {
                         rndCheck = 0.1f;
                     }
-                    rndCheck = rndCheck - (locationSize / 128);
+                    rndCheck = rndCheck;
                     rnd = NoiseWeight(latitude, longitude);
                     if(rnd >= rndCheck) {
                         //tileData[index] = GetClimateWeightedRecord(rnd, worldClimate);
@@ -339,10 +339,11 @@ namespace DaggerfallWorkshop
                     return;
                 } else if (height > oceanElevation && height < (beachElevation  + (JobRand.Next(-15000000, 15000000) / 10000000f)))
                 {
-                    tileData[index] = dirt;
+                    tileData[index] = GetClimateWeightedRecord(rnd, worldClimate);
                     return;
                 } else if(locationID > -1) {
-                    tileData[index] = dirt;
+                    weight += NoiseWeight(latitude, longitude);
+                    tileData[index] = GetClimateWeightedRecord(weight, worldClimate);
                     return;
                 }
                 // Set texture tile using weighted noise
