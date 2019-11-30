@@ -386,17 +386,6 @@ namespace DaggerfallWorkshop
         public int worldClimateNorthWest;
         /* BLB: Neighbouring climates of the map pixel */
 
-        /* BLB: Neighbouring location indicators */
-        public bool locationNorth;
-        public bool locationNorthEast;
-        public bool locationEast;
-        public bool locationSouthEast;
-        public bool locationSouth;
-        public bool locationSouthWest;
-        public bool locationWest;
-        public bool locationNorthWest;
-        /* BLB: Neighbouring location indicators */
-
         public int worldPolitic;                    // Politics of this pixel
         public bool hasLocation;                    // True if location present
         public int mapRegionIndex;                  // Map region index (if location present)
