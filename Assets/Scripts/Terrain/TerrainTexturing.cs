@@ -72,7 +72,6 @@ namespace DaggerfallWorkshop
                 /* BLB: Added but not currently used except for locationID and locationSize */
             };
             JobHandle tileDataHandle = tileDataJob.Schedule(tileDataDim * tileDataDim, 64, dependencies);
-
             // Assign tile data to terrain
             NativeArray<byte> lookupData = new NativeArray<byte>(lookupTable, Allocator.TempJob);
             AssignTilesJob assignTilesJob = new AssignTilesJob
@@ -84,6 +83,8 @@ namespace DaggerfallWorkshop
                 tDim = assignTilesDim,
                 march = march,
                 locationRect = mapData.locationRect,
+
+                locationID = mapData.locationID
             };
             JobHandle assignTilesHandle = assignTilesJob.Schedule(assignTilesDim * assignTilesDim, 64, tileDataHandle);
 
@@ -112,6 +113,7 @@ namespace DaggerfallWorkshop
             public int tDim;
             public bool march;
             public Rect locationRect;
+            public int locationID;
 
             public void Execute(int index)
             {
@@ -119,8 +121,16 @@ namespace DaggerfallWorkshop
                 int y = JobA.Col(index, tDim);
 
                 // Do nothing if in location rect as texture already set, to 0xFF if zero
-                if (tilemapData[index] != 0)
+                if(locationID > -1 && 
+                    (x > locationRect.xMin - 4 && x < locationRect.xMax + 4) && 
+                    (y > locationRect.yMin && y - 4 < locationRect.yMax + 4) && 
+                    tilemapData[index] != 0 
+                ) {
                     return;
+                }
+
+                //if (tilemapData[index] != 0)
+                    //return;
 
                 // Assign tile texture
                 if (march)
@@ -315,29 +325,25 @@ namespace DaggerfallWorkshop
                     rndCheck = rndCheck - (locationSize / 128);
                     rnd = NoiseWeight(latitude, longitude);
                     if(rnd >= rndCheck) {
-                        tileData[index] = dirt;
+                        tileData[index] = GetClimateWeightedRecord(rnd, worldClimate);
                         return;
                     }
                     tileData[index] = water;
                     return;
                 }
-                randMin = -60000000;
-                randMax = 1000000;
-                rnd = (JobRand.Next(randMin, randMax) / 10000000f);
                 // Ocean texture
-                if ((height + rnd) <= oceanElevation || worldClimate == 223)
+                if (height <= oceanElevation || worldClimate == 223)
                 {
                     tileData[index] = water;
                     return;
-                }
-                // Beach texture
-                // Adds a little +/- randomness to threshold so beach line isn't too regular
-                if (height > oceanElevation && height < beachElevation)
+                } else if (height > oceanElevation && height < (beachElevation  + (JobRand.Next(-15000000, 15000000) / 10000000f)))
                 {
                     tileData[index] = dirt;
                     return;
+                } else if(locationID > -1) {
+                    tileData[index] = dirt;
+                    return;
                 }
-
                 // Set texture tile using weighted noise
                 weight = 0;
                 weight += NoiseWeight(latitude, longitude);
