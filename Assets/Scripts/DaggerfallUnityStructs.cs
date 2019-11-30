@@ -351,6 +351,18 @@ namespace DaggerfallWorkshop
         public uint ModelID;                            // Numerical model ID of building in ARCH3D.BSA - 0 means no model found
     }
 
+    public enum Neighbours
+    {
+        North,
+        NorthEast,
+        East,
+        SouthEast,
+        South,
+        SouthWest,
+        West,
+        NorthWest
+    }
+
     /// <summary>
     /// Information about a single map pixel for streaming world.
     /// </summary>
@@ -363,8 +375,6 @@ namespace DaggerfallWorkshop
         public int worldHeight;                     // Height of this pixel (not scaled)
         public int worldClimate;                    // Climate of this pixel
 
-        /* BLB: Indicator for sealevel (worldHeight <= 2) - not currently used */
-        public bool seaLevel;
         /* BLB: Neighbouring climates of the map pixel */
         public int worldClimateNorth;
         public int worldClimateNorthEast;
