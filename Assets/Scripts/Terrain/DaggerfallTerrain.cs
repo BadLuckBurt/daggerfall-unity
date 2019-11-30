@@ -364,30 +364,30 @@ namespace DaggerfallWorkshop
 
         #region Editor Support
 
-        //#if UNITY_EDITOR
-        //        /// <summary>
-        //        /// Allows editor to set terrain independently of StreamingWorld. 
-        //        /// Mainly for testing purposes, but could be used for static scenes.
-        //        /// Also shows full terrain setup procedure for reference.
-        //        /// </summary>
-        //        public void __EditorUpdateTerrain()
-        //        {
-        //            // Setup terrain
-        //            InstantiateTerrain();
+//#if UNITY_EDITOR
+//        /// <summary>
+//        /// Allows editor to set terrain independently of StreamingWorld. 
+//        /// Mainly for testing purposes, but could be used for static scenes.
+//        /// Also shows full terrain setup procedure for reference.
+//        /// </summary>
+//        public void __EditorUpdateTerrain()
+//        {
+//            // Setup terrain
+//            InstantiateTerrain();
 
-        //            // Update data for terrain
-        //            UpdateMapPixelData();
-        //            UpdateTileMapData();
-        //            //UpdateHeightData();
+//            // Update data for terrain
+//            UpdateMapPixelData();
+//            UpdateTileMapData();
+//            //UpdateHeightData();
 
-        //            // Promote data to live terrain
-        //            UpdateClimateMaterial();
-        //            PromoteTerrainData();
+//            // Promote data to live terrain
+//            UpdateClimateMaterial();
+//            PromoteTerrainData();
 
-        //            // Set neighbours
-        //            UpdateNeighbours();
-        //        }
-        //#endif
+//            // Set neighbours
+//            UpdateNeighbours();
+//        }
+//#endif
 
         #endregion
 
