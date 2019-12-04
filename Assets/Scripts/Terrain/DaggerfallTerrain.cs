@@ -396,14 +396,14 @@ namespace DaggerfallWorkshop
         private void PopulateAdjacentClimatesArray(NativeArray<byte> climateArray)
         {
             MapsFile mapsFile = dfUnity.ContentReader.MapFileReader;
-            climateArray[(int)MapPixelData.Adjacent.North] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY + 1);
-            climateArray[(int)MapPixelData.Adjacent.NorthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.North] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.NorthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY - 1);
             climateArray[(int)MapPixelData.Adjacent.East] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY);
-            climateArray[(int)MapPixelData.Adjacent.SouthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY - 1);
-            climateArray[(int)MapPixelData.Adjacent.South] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY - 1);
-            climateArray[(int)MapPixelData.Adjacent.SouthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.SouthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.South] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.SouthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY + 1);
             climateArray[(int)MapPixelData.Adjacent.West] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY);
-            climateArray[(int)MapPixelData.Adjacent.NorthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.NorthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY - 1);
         }
 
         private bool ReadyCheck()
