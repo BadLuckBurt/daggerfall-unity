@@ -29,7 +29,7 @@ namespace DaggerfallWorkshop
     /// Generates texture tiles for terrains and uses marching squares for tile transitions.
     /// These features are very much in early stages of development.
     /// </summary>
-    public class TerrainTexturing : ITerrainTexturing
+    public class DefaultTerrainTexturing : ITerrainTexturing
     {
         // Use same seed to ensure continuous tiles
         const int seed = 417028;
@@ -45,7 +45,7 @@ namespace DaggerfallWorkshop
 
         byte[] lookupTable;
 
-        public TerrainTexturing()
+        public DefaultTerrainTexturing()
         {
             CreateLookupTable();
         }
