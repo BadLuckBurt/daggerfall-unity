@@ -393,7 +393,15 @@ namespace DaggerfallWorkshop
         public NativeArray<float> avgMaxHeight;     // Average and max height of terrain for location placement (unmanaged memory)
 
         [HideInInspector, NonSerialized]
+        public NativeArray<byte> adjacentClimates;   // Climate data for neighbouring map pixels (unmanaged memory)
+
+        [HideInInspector, NonSerialized]
         public List<IDisposable> nativeArrayList;   // List of temp working native arrays (unmanaged memory) for disposal when jobs complete
+
+        public enum Adjacent
+        {
+            North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest
+        }
     }
 
     /// <summary>

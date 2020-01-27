@@ -18,10 +18,18 @@ using Unity.Collections;
 namespace DaggerfallWorkshop
 {
     /// <summary>
+    /// Terrain texturing interface.
+    /// </summary>
+    public interface ITerrainTexturing
+    {
+        JobHandle ScheduleAssignTilesJob(ITerrainSampler terrainSampler, ref MapPixelData mapData, JobHandle dependencies, bool march = true);
+    }
+
+    /// <summary>
     /// Generates texture tiles for terrains and uses marching squares for tile transitions.
     /// These features are very much in early stages of development.
     /// </summary>
-    public class TerrainTexturing
+    public class TerrainTexturing : ITerrainTexturing
     {
         // Use same seed to ensure continuous tiles
         const int seed = 417028;
