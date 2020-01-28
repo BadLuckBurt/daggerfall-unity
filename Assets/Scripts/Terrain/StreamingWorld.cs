@@ -1638,10 +1638,15 @@ namespace DaggerfallWorkshop
             }
 
             // Perform initial runtime setup
-            if (Application.isPlaying && dfUnity.TerrainSampler.DilateCoastalClimates())
+            if (Application.isPlaying)
             {
                 // Fix coastal climate data if sampler requires it
-                TerrainHelper.DilateCoastalClimate(dfUnity.ContentReader, 2);
+                if (dfUnity.TerrainSampler.DilateCoastalClimates())
+                {
+                    TerrainHelper.DilateCoastalClimate(dfUnity.ContentReader, 2);
+                }
+                // Smooth steep location on steep gradients
+                TerrainHelper.SmoothLocationNeighbourhood(dfUnity.ContentReader);
             }
 
             // Raise ready flag
