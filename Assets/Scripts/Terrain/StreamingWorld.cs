@@ -1645,14 +1645,10 @@ namespace DaggerfallWorkshop
             }
 
             // Perform initial runtime setup
-            if (Application.isPlaying)
+            if (Application.isPlaying && dfUnity.TerrainSampler.DilateCoastalClimates())
             {
-                // Fix coastal climate data
+                // Fix coastal climate data if sampler requires it
                 TerrainHelper.DilateCoastalClimate(dfUnity.ContentReader, 2);
-
-                // Smooth steep location on steep gradients
-                // TODO: What is this supposed to be doing? It doesn't seem to change any data that's used anywhere..
-                TerrainHelper.SmoothLocationNeighbourhood(dfUnity.ContentReader);
             }
 
             // Raise ready flag
