@@ -185,9 +185,9 @@ namespace DaggerfallWorkshop
         /// 1) BeginMapPixelDataUpdate - Schedules terrain data update using jobs system.
         /// 2) CompleteMapPixelDataUpdate - Completes terrain data update using jobs system.
         /// </summary>
-        /// <param name="terrainTexturing">Instance of TerrainTexturing class to use.</param>
+        /// <param name="terrainTexturing">Instance of ITerrainTexturing implementation class to use.</param>
         /// <returns>JobHandle of the scheduled jobs</returns>
-        public JobHandle BeginMapPixelDataUpdate(TerrainTexturing terrainTexturing = null)
+        public JobHandle BeginMapPixelDataUpdate(ITerrainTexturing terrainTexturing = null)
         {
             // Get basic terrain data.
             MapData = TerrainHelper.GetMapPixelData(dfUnity.ContentReader, MapPixelX, MapPixelY);
@@ -203,6 +203,10 @@ namespace DaggerfallWorkshop
 
             // Create data array for average & max heights.
             MapData.avgMaxHeight = new NativeArray<float>(new float[] { 0, float.MinValue }, Allocator.TempJob);
+
+            // Create data array for adjacent (neighbour) climates.
+            MapData.adjacentClimates = new NativeArray<byte>(8, Allocator.TempJob);
+            PopulateAdjacentClimatesArray(MapData.adjacentClimates);
 
             // Create list for recording native arrays that need disposal after jobs complete.
             MapData.nativeArrayList = new List<IDisposable>();
@@ -240,8 +244,8 @@ namespace DaggerfallWorkshop
         /// <summary>
         /// Complete terrain data update using jobs system. (second of a two stage process)
         /// </summary>
-        /// <param name="terrainTexturing">Instance of TerrainTexturing class to use.</param>
-        public void CompleteMapPixelDataUpdate(TerrainTexturing terrainTexturing = null)
+        /// <param name="terrainTexturing">Instance of ITerrainTexturing implementation class to use.</param>
+        public void CompleteMapPixelDataUpdate(ITerrainTexturing terrainTexturing = null)
         {
             // Convert heightmap data back to standard managed 2d array.
             MapData.heightmapSamples = new float[heightmapDim, heightmapDim];
@@ -293,6 +297,8 @@ namespace DaggerfallWorkshop
                 MapData.avgMaxHeight.Dispose();
             if (MapData.tileMap.IsCreated)
                 MapData.tileMap.Dispose();
+            if (MapData.adjacentClimates.IsCreated)
+                MapData.adjacentClimates.Dispose();
         }
 
         /// <summary>
@@ -410,6 +416,19 @@ namespace DaggerfallWorkshop
             ready = true;
 
             return true;
+        }
+
+        private void PopulateAdjacentClimatesArray(NativeArray<byte> climateArray)
+        {
+            MapsFile mapsFile = dfUnity.ContentReader.MapFileReader;
+            climateArray[(int)MapPixelData.Adjacent.North] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.NorthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY + 1);
+            climateArray[(int)MapPixelData.Adjacent.East] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY);
+            climateArray[(int)MapPixelData.Adjacent.SouthEast] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX + 1, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.South] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.SouthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY - 1);
+            climateArray[(int)MapPixelData.Adjacent.West] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY);
+            climateArray[(int)MapPixelData.Adjacent.NorthWest] = (byte)mapsFile.GetClimateIndex(MapData.mapPixelX - 1, MapData.mapPixelY + 1);
         }
 
         #endregion

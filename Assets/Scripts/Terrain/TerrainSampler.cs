@@ -64,6 +64,12 @@ namespace DaggerfallWorkshop
         float TerrainHeightScale(int x, int y);
 
         /// <summary>
+        /// Enables dilation of coastal climates by TerrainHelper.DilateCoastalClimate() at startup.
+        /// </summary>
+        /// <returns>True if coastal climates should be dilated, false otherwise</returns>
+        bool DilateCoastalClimates();
+
+        /// <summary>
         /// Populates a MapPixelData struct using custom height sample generator.
         /// </summary>
         /// <param name="mapPixel">MapPixelData struct.</param>
@@ -94,7 +100,9 @@ namespace DaggerfallWorkshop
         public virtual float MeanTerrainHeightScale { get; set; }
         public virtual float OceanElevation { get; set; }
         public virtual float BeachElevation { get; set; }
-        
+
+        public virtual bool DilateCoastalClimates() { return true; }
+
         //this function may be overriden if terrain sampler implementation creates different height scales for different map pixels
         public virtual float TerrainHeightScale(int x, int y) { return MeanTerrainHeightScale; } // default implementation returns MeanTerrainHeightScale for every world map position
 
